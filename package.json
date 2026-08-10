@@ -1,0 +1,41 @@
+{
+  "name": "rwanda-notice-board",
+  "version": "1.0.0",
+  "description": "Rwanda Notice Board - Professional Information Platform",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "@prisma/client": "^5.7.1",
+    "next-auth": "^5.0.0-beta.14",
+    "bcryptjs": "^2.4.3",
+    "zod": "^3.22.4",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^4.12.0",
+    "clsx": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "prisma": "^5.7.1",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.7.0"
+  }
+}
