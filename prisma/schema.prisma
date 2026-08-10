@@ -1,0 +1,534 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  AUTHOR
+  MODERATOR
+  USER
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum VerificationStatus {
+  VERIFIED
+  PENDING
+  UNVERIFIED
+}
+
+enum ReportReason {
+  FALSE_INFORMATION
+  SPAM
+  INAPPROPRIATE_CONTENT
+  SCAM
+  COPYRIGHT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  REJECTED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          UserRole  @default(USER)
+  emailVerified DateTime?
+  image         String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  news          News[]
+  announcements Announcement[]
+  jobs          Job[]
+  opportunities Opportunity[]
+  educationPosts EducationPost[]
+  healthPosts   HealthPost[]
+  businessPosts BusinessPost[]
+  events        Event[]
+  destinations  Destination[]
+  comments      Comment[]
+  reports       Report[]
+  contactMessages ContactMessage[]
+  newsletterSubscriptions NewsletterSubscriber[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  language    String    @default("en")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  news          News[]
+  announcements Announcement[]
+  jobs          Job[]
+  opportunities Opportunity[]
+  educationPosts EducationPost[]
+  healthPosts   HealthPost[]
+  businessPosts BusinessPost[]
+  events        Event[]
+
+  @@index([language])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+}
+
+model News {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  content              String
+  excerpt              String?
+  description          String?
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  featured             Boolean             @default(false)
+  views                Int                 @default(0)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model Announcement {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  content              String
+  excerpt              String?
+  description          String?
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  urgent               Boolean             @default(false)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model Job {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  description          String
+  requirements         String?
+  salary               String?
+  location             String?
+  jobType              String              @default("Full-time")
+  company              String
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  deadline             DateTime?
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model Opportunity {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  description          String
+  details              String?
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  deadline             DateTime?
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model EducationPost {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  content              String
+  excerpt              String?
+  description          String?
+  image                String?
+  institution          String?
+  level                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model HealthPost {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  content              String
+  excerpt              String?
+  description          String?
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model BusinessPost {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  content              String
+  excerpt              String?
+  description          String?
+  image                String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model Event {
+  id                   String              @id @default(cuid())
+  title                String
+  slug                 String              @unique
+  description          String
+  details              String?
+  image                String?
+  location             String?
+  eventDate            DateTime
+  eventEndDate         DateTime?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+  categoryId           String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category             Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+  @@index([eventDate])
+}
+
+model Destination {
+  id                   String              @id @default(cuid())
+  name                 String
+  slug                 String              @unique
+  description          String
+  image                String?
+  location             String?
+  status               ContentStatus       @default(DRAFT)
+  verificationStatus   VerificationStatus  @default(PENDING)
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  // Foreign keys
+  authorId             String
+
+  // Relations
+  author               User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments             Comment[]
+  reports              Report[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([slug])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  authorId  String
+  newsId    String?
+  announcementId String?
+  jobId     String?
+  opportunityId String?
+  educationPostId String?
+  healthPostId String?
+  businessPostId String?
+  eventId   String?
+  destinationId String?
+
+  // Relations
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  news      News?    @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  announcement Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  educationPost EducationPost? @relation(fields: [educationPostId], references: [id], onDelete: Cascade)
+  healthPost HealthPost? @relation(fields: [healthPostId], references: [id], onDelete: Cascade)
+  businessPost BusinessPost? @relation(fields: [businessPostId], references: [id], onDelete: Cascade)
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  destination Destination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([newsId])
+  @@index([announcementId])
+  @@index([jobId])
+  @@index([opportunityId])
+}
+
+model Report {
+  id        String       @id @default(cuid())
+  reason    ReportReason
+  description String?
+  status    ReportStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Foreign keys
+  reporterId String
+  newsId    String?
+  announcementId String?
+  jobId     String?
+  opportunityId String?
+  educationPostId String?
+  healthPostId String?
+  businessPostId String?
+  eventId   String?
+  destinationId String?
+
+  // Relations
+  reporter  User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  news      News?    @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  announcement Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  educationPost EducationPost? @relation(fields: [educationPostId], references: [id], onDelete: Cascade)
+  healthPost HealthPost? @relation(fields: [healthPostId], references: [id], onDelete: Cascade)
+  businessPost BusinessPost? @relation(fields: [businessPostId], references: [id], onDelete: Cascade)
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  destination Destination? @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([status])
+  @@index([newsId])
+  @@index([announcementId])
+  @@index([jobId])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  subscribedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  userId    String?
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  userId    String?
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([read])
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  type      String   @default("image")
+  size      Int?
+  mimetype  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
